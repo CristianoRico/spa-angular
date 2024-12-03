@@ -62,22 +62,22 @@ export class FakultasComponent implements OnInit {  // Deklarasi komponen dengan
           this.isSubmitting = false;  // Reset status submitting
 
           // Tutup modal setelah data berhasil ditambahkan
-          const modalElement = document.getElementById('tambahFakultasModal') as HTMLElement;
-          if (modalElement) {
-            const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-            modalInstance.hide();
+          // const modalElement = document.getElementById('tambahFakultasModal') as HTMLElement;
+          // if (modalElement) {
+          //   const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+          //   modalInstance.hide();
 
-            // Hapus elemen backdrop jika ada
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-              backdrop.remove();
-            }
+          //   // Hapus elemen backdrop jika ada
+          //   const backdrop = document.querySelector('.modal-backdrop');
+          //   if (backdrop) {
+          //     backdrop.remove();
+          //   }
 
-            // Pulihkan scroll pada body
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-          }
+          //   // Pulihkan scroll pada body
+          //   document.body.classList.remove('modal-open');
+          //   document.body.style.overflow = '';
+          //   document.body.style.paddingRight = '';
+          // }
         },
         error: (err) => {
           console.error('Error menambahkan fakultas:', err);
