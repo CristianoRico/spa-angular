@@ -90,4 +90,62 @@ export class FakultasComponent implements OnInit {  // Deklarasi komponen dengan
       });
     }
   }
+  editFakultasId: string | null = null;
+  getFakultasById(_id: string): void {
+    this.editFakultasId = _id;
+    this.http.get(`${this.apiUrl}/${_id}`).subscribe({
+      next: (data: any) => {
+        this.fakultasForm.patchValue({
+          nama: data.nama,
+          singkatan: data.singkatan,
+        });
+        // Buka modal edit
+        const modalElement = document.getElementById('editFakultasModal') as HTMLElement;
+        if (modalElement) {
+          const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+          modalInstance.show();
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching fakultas by ID:', err);
+      },
+    });
+  }
+  // Method untuk memperbarui data Fakultas
+  updateFakultas(): void {
+    if (this.fakultasForm.valid && this.editFakultasId) {
+      this.isSubmitting = true;
+      this.http.put(`${this.apiUrl}/${this.editFakultasId}`, this.fakultasForm.value).subscribe({
+        next: (response) => {
+          console.log('Fakultas berhasil diperbarui:', response);
+          this.getFakultas();
+          this.isSubmitting = false;
+          // Tutup modal edit setelah data berhasil diupdate
+          const modalElement = document.getElementById('editFakultasModal') as HTMLElement;
+          if (modalElement) {
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance?.hide();
+          }
+        },
+        error: (err) => {
+          console.error('Error updating fakultas:', err);
+          this.isSubmitting = false;
+        },
+      });
+    }
+  }
+  // Method untuk menghapus data Fakultas
+  deleteFakultas(_id: string): void {
+    if (confirm('Apakah Anda yakin ingin menghapus fakultas ini?')) {
+      this.http.delete(`${this.apiUrl}/${_id}`).subscribe({
+        next: () => {
+          console.log(`Fakultas dengan ID ${_id} berhasil dihapus`);
+          this.getFakultas(); // Refresh data Fakultas setelah penghapusan
+        },
+        error: (err) => {
+          console.error('Error menghapus fakultas:', err);
+        },
+      });
+    }
+  }
 }

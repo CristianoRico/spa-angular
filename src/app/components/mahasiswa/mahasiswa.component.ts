@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common'; // Mengimpor modul Angular yang 
 import { Component, OnInit, inject } from '@angular/core'; // Mengimpor decorator Component, interface OnInit untuk inisialisasi, dan inject untuk injeksi dependency.
 import { HttpClient } from '@angular/common/http'; // Mengimpor HttpClient untuk melakukan HTTP request ke server.
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'; // Mengimpor modul dan class untuk membuat formulir reaktif.
+import * as bootstrap from 'bootstrap'; // Mengimpor Bootstrap untuk manipulasi modal dan elemen lainnya.
 
 @Component({
   selector: 'app-mahasiswa', // Selector untuk komponen ini digunakan dalam template HTML.
@@ -27,7 +28,7 @@ export class MahasiswaComponent implements OnInit { // Mendeklarasikan class kom
       npm: [''], // Field NPM mahasiswa.
       nama: [''], // Field nama mahasiswa.
       prodi_id: [null], // Field prodi_id untuk relasi dengan program studi.
-      jenis_kelamin: ['L'], // Field jenis kelamin mahasiswa.
+      jenis_kelamin: [''], // Field jenis kelamin mahasiswa.
       asal_sekolah: [''], // Field asal sekolah mahasiswa.
       foto: [''] // Field foto mahasiswa (untuk upload file).
     });
@@ -74,6 +75,26 @@ export class MahasiswaComponent implements OnInit { // Mendeklarasikan class kom
           this.getMahasiswa(); // Refresh data mahasiswa setelah penambahan.
           this.mahasiswaForm.reset(); // Reset form setelah data dikirim.
           this.isSubmitting = false; // Menonaktifkan indikator pengiriman.
+
+          // Tutup modal setelah data berhasil ditambahkan
+          const modalElement = document.getElementById('tambahProdiModal') as HTMLElement; // Ambil elemen modal berdasarkan ID.
+          if (modalElement) { // Periksa jika elemen modal ada.
+            const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement); // Ambil atau buat instance modal.
+            modalInstance.hide(); // Sembunyikan modal.
+
+            // Pastikan untuk menghapus atribut dan gaya pada body setelah modal ditutup
+            modalElement.addEventListener('hidden.bs.modal', () => { // Tambahkan event listener untuk modal yang ditutup.
+              const backdrop = document.querySelector('.modal-backdrop'); // Cari elemen backdrop modal.
+              if (backdrop) { 
+                backdrop.remove(); // Hapus backdrop jika ada.
+              }
+
+              // Pulihkan scroll pada body
+              document.body.classList.remove('modal-open'); // Hapus class 'modal-open' dari body.
+              document.body.style.overflow = ''; // Pulihkan properti overflow pada body.
+              document.body.style.paddingRight = ''; // Pulihkan padding body.
+            }, { once: true }); // Event listener hanya dijalankan sekali.
+          }
         },
         error: (err) => {
           console.error('Error menambahkan mahasiswa:', err);
@@ -94,6 +115,59 @@ export class MahasiswaComponent implements OnInit { // Mendeklarasikan class kom
         error: (err) => {
           console.error('Error menghapus mahasiswa:', err);
         }
+      });
+    }
+  }
+
+  editMahasiswaId: string | null = null;
+  
+  getMahasiswaById(_id: string): void {
+    console.log('Fetching Mahasiswa with ID:', _id);
+    this.editMahasiswaId = _id;
+    this.http.get(`${this.apiMahasiswaUrl}/${_id}`).subscribe({
+      next: (data: any) => {
+        console.log('Mahasiswa data fetched:', data);
+        this.mahasiswaForm.patchValue({
+          npm: data.npm,
+          nama: data.nama,
+          prodi_id: data.prodi_id,
+          jenis_kelamin: data.jenis_kelamin,
+          asal_sekolah: data.asal_sekolah,
+          foto: data.foto,
+        });
+        // Buka modal edit
+        const modalElement = document.getElementById('editMahasiswaModal') as HTMLElement;
+        if (modalElement) {
+          const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+          modalInstance.show();
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching Mahasiswa by ID:', err);
+      },
+    });
+  }
+
+  updateMahasiswa(): void {
+    if (this.mahasiswaForm.valid && this.editMahasiswaId) {
+      this.isSubmitting = true; // Aktifkan indikator pengiriman data
+      this.http.put(`${this.apiMahasiswaUrl}/${this.editMahasiswaId}`, this.mahasiswaForm.value).subscribe({
+        next: (response) => {
+          console.log('Mahasiswa berhasil diperbarui:', response);
+          this.getMahasiswa(); // Refresh data mahasiswa
+          this.isSubmitting = false;
+  
+          // Tutup modal edit
+          const modalElement = document.getElementById('editMahasiswaModal') as HTMLElement;
+          if (modalElement) {
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance?.hide();
+          }
+        },
+        error: (err) => {
+          console.error('Error updating mahasiswa:', err);
+          this.isSubmitting = false; // Nonaktifkan indikator pengiriman data
+        },
       });
     }
   }
