@@ -133,7 +133,7 @@ export class MahasiswaComponent implements OnInit { // Mendeklarasikan class kom
           prodi_id: data.prodi_id,
           jenis_kelamin: data.jenis_kelamin,
           asal_sekolah: data.asal_sekolah,
-          foto: data.foto,
+          foto: '',
         });
         // Buka modal edit
         const modalElement = document.getElementById('editMahasiswaModal') as HTMLElement;
