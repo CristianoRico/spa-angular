@@ -66,7 +66,11 @@ export class ProdiComponent implements OnInit { // Mendeklarasikan class kompone
   addProdi(): void {
     if (this.prodiForm.valid) { // Memastikan form valid sebelum mengirim data.
       this.isSubmitting = true; // Mengaktifkan indikator pengiriman data.
-      this.http.post(this.apiProdiUrl, this.prodiForm.value).subscribe({ // Melakukan HTTP POST ke API prodi.
+
+      const token = localStorage.getItem('authToken'); // Ambil token dari Localstorage
+      const headers = { Authorization: `Bearer ${token}` }; // Tambahkan bearer token ke header
+
+      this.http.post(this.apiProdiUrl, this.prodiForm.value, { headers }).subscribe({ // Melakukan HTTP POST ke API prodi.
         next: (response) => { // Callback jika request berhasil.
           console.log('Prodi berhasil ditambahkan:', response); // Log respons ke konsol.
           this.getProdi(); // Refresh data prodi setelah penambahan.
@@ -100,10 +104,16 @@ export class ProdiComponent implements OnInit { // Mendeklarasikan class kompone
       });
     }
   }
+
+
   // Method untuk menghapus prodi
   deleteProdi(_id: string): void {
     if (confirm('Apakah Anda yakin ingin menghapus data ini?')) { // Konfirmasi penghapusan
-      this.http.delete(`${this.apiProdiUrl}/${_id}`).subscribe({
+
+      const token = localStorage.getItem('authToken'); // Ambil token dari Localstorage
+      const headers = { Authorization: `Bearer ${token}` }; // Tambahkan bearer token ke header
+
+      this.http.delete(`${this.apiProdiUrl}/${_id}`, { headers }).subscribe({
         next: () => {
           console.log(`Prodi dengan ID ${_id} berhasil dihapus`);
           this.getProdi(); // Refresh data prodi setelah penghapusan
@@ -145,7 +155,11 @@ export class ProdiComponent implements OnInit { // Mendeklarasikan class kompone
   updateProdi(): void {
     if (this.prodiForm.valid) {
       this.isSubmitting = true;
-      this.http.put(`${this.apiProdiUrl}/${this.editProdiId}`, this.prodiForm.value).subscribe({
+
+      const token = localStorage.getItem('authToken'); // Ambil token dari Localstorage
+      const headers = { Authorization: `Bearer ${token}` }; // Tambahkan bearer token ke header
+
+      this.http.put(`${this.apiProdiUrl}/${this.editProdiId}`, this.prodiForm.value, { headers }).subscribe({
         next: (response) => {
           console.log('Prodi berhasil diperbarui:', response);
           this.getProdi(); // Refresh data prodi
