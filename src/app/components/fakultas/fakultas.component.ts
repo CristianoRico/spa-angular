@@ -58,7 +58,11 @@ export class FakultasComponent implements OnInit {  // Deklarasi komponen dengan
   addFakultas(): void {
     if (this.fakultasForm.valid) {
       this.isSubmitting = true;  // Set status submitting
-      this.http.post(this.apiUrl, this.fakultasForm.value).subscribe({
+
+      const token = localStorage.getItem('authToken');
+      const headers = {Authorization: `Bearer ${token}`};
+
+      this.http.post(this.apiUrl, this.fakultasForm.value, { headers }).subscribe({
         next: (response) => {
           console.log('Data berhasil ditambahkan:', response);
           this.getFakultas();  // Refresh data fakultas
@@ -115,7 +119,11 @@ export class FakultasComponent implements OnInit {  // Deklarasi komponen dengan
   updateFakultas(): void {
     if (this.fakultasForm.valid && this.editFakultasId) {
       this.isSubmitting = true;
-      this.http.put(`${this.apiUrl}/${this.editFakultasId}`, this.fakultasForm.value).subscribe({
+
+      const token = localStorage.getItem('authToken');
+      const headers = {Authorization: `Bearer ${token}`};
+
+      this.http.put(`${this.apiUrl}/${this.editFakultasId}`, this.fakultasForm.value, { headers }).subscribe({
         next: (response) => {
           console.log('Fakultas berhasil diperbarui:', response);
           this.getFakultas();
@@ -137,7 +145,11 @@ export class FakultasComponent implements OnInit {  // Deklarasi komponen dengan
   // Method untuk menghapus data Fakultas
   deleteFakultas(_id: string): void {
     if (confirm('Apakah Anda yakin ingin menghapus fakultas ini?')) {
-      this.http.delete(`${this.apiUrl}/${_id}`).subscribe({
+
+      const token = localStorage.getItem('authToken');
+      const headers = {Authorization: `Bearer ${token}`};
+      
+      this.http.delete(`${this.apiUrl}/${_id}`, { headers }).subscribe({
         next: () => {
           console.log(`Fakultas dengan ID ${_id} berhasil dihapus`);
           this.getFakultas(); // Refresh data Fakultas setelah penghapusan
